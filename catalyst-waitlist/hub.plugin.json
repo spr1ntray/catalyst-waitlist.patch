@@ -1,0 +1,204 @@
+{
+  "$schema": "https://soft-hub.local/schemas/plugin-v1.json",
+  "schema_version": 1,
+  "contract_version": "SH-SOFTWARE-0.6/5",
+  "id": "io.sprintray.catalyst-waitlist",
+  "name": "Catalyst Waitlist",
+  "version": "1.0.2",
+  "description": "Записывает email в waitlist Catalyst по реферальной цепи Hub и через proxy аккаунта.",
+  "author": "sprintray",
+  "presentation": {
+    "display_name": "Catalyst Waitlist",
+    "description": "Повторяет форму Join waitlist на catalyst.app: email и код родителя из цепи Hub. Twitter не обязателен. Публичный handle, если он нужен, лежит в данных софта под ключом twitter_handle; пустое поле не мешает заявке. Аккаунты одного уровня идут параллельно, следующий уровень ждёт invite-ссылку родителя. Код ссылки в журнал и результаты не попадает.",
+    "assets": {
+      "icon": "assets/icon.png",
+      "image": "assets/image.png"
+    }
+  },
+  "catalog": {
+    "sections": ["nft"]
+  },
+  "compatibility": {
+    "hub": ">=0.6.29",
+    "python": ">=3.12,<3.13",
+    "os": ["darwin"]
+  },
+  "runtime": {
+    "type": "python",
+    "entrypoint": "plugin.main:run",
+    "protocol": "soft-hub-jsonl/1",
+    "state_model": "stateless",
+    "requirements": "requirements.txt",
+    "safe_stop": true,
+    "heartbeat_seconds": 15
+  },
+  "permissions": {
+    "secrets": ["email", "proxy"],
+    "account_data": ["twitter_handle"],
+    "network": ["api.catalyst.app", "catalyst.app"],
+    "chains": [],
+    "financial_risk": "none",
+    "browser": false,
+    "local_services": []
+  },
+  "actions": [
+    {
+      "id": "join_waitlist",
+      "name": "Записать в waitlist",
+      "description": "Отправляет форму WL. Twitter не нужен. Корни идут без кода, дети только с кодом прямого родителя из этого запуска. Потоки — внутри одного уровня цепи.",
+      "risk": "external_write",
+      "account_mode": "one_or_more",
+      "permissions": {
+        "secrets": ["email", "proxy"],
+        "account_data": ["twitter_handle"]
+      },
+      "resources": {
+        "account": ["email", "proxy"],
+        "settings": []
+      },
+      "referral": {
+        "mode": "project_runtime",
+        "parent_required": false,
+        "parent_access": "shared_read",
+        "permissions": {
+          "secrets": []
+        },
+        "resources": {
+          "account": []
+        }
+      },
+      "output": {
+        "mode": "account_table",
+        "title": "Catalyst waitlist",
+        "primary_kind": "account_snapshot",
+        "columns": [
+          {
+            "key": "joined",
+            "title": "В списке",
+            "type": "integer",
+            "aggregate": "sum"
+          },
+          {
+            "key": "referral_attached",
+            "title": "Код родителя",
+            "type": "boolean"
+          },
+          {
+            "key": "twitter_sent",
+            "title": "Twitter отправлен",
+            "type": "boolean"
+          },
+          {
+            "key": "outcome",
+            "title": "Итог",
+            "type": "string"
+          }
+        ]
+      },
+      "options": {
+        "type": "object",
+        "properties": {
+          "account_concurrency": {
+            "type": "integer",
+            "title": "Параллельные аккаунты",
+            "description": "Сколько профилей одного уровня цепи отправлять сразу. Дети ждут родителей.",
+            "default": 3,
+            "minimum": 1,
+            "maximum": 8,
+            "multipleOf": 1,
+            "x-ui": {
+              "group": "Выполнение",
+              "order": 0,
+              "unit": "аккаунтов"
+            }
+          },
+          "account_pause_min_ms": {
+            "type": "integer",
+            "title": "Пауза перед аккаунтом",
+            "description": "Случайная пауза перед каждым аккаунтом. Софт берёт значение между бегунками.",
+            "default": 400,
+            "minimum": 0,
+            "maximum": 30000,
+            "multipleOf": 100,
+            "x-ui": {
+              "group": "Темп",
+              "order": 10,
+              "unit": "мс",
+              "control": "dual_range",
+              "range": {"id": "account_pause", "role": "from"}
+            }
+          },
+          "account_pause_max_ms": {
+            "type": "integer",
+            "title": "Пауза перед аккаунтом",
+            "description": "Случайная пауза перед каждым аккаунтом. Софт берёт значение между бегунками.",
+            "default": 1200,
+            "minimum": 0,
+            "maximum": 30000,
+            "multipleOf": 100,
+            "x-ui": {
+              "group": "Темп",
+              "order": 11,
+              "unit": "мс",
+              "control": "dual_range",
+              "range": {"id": "account_pause", "role": "to"}
+            }
+          },
+          "level_pause_min_ms": {
+            "type": "integer",
+            "title": "Пауза между уровнями",
+            "description": "Случайная пауза после родителей, перед их детьми. Софт берёт значение между бегунками.",
+            "default": 800,
+            "minimum": 0,
+            "maximum": 60000,
+            "multipleOf": 100,
+            "x-ui": {
+              "group": "Темп",
+              "order": 20,
+              "unit": "мс",
+              "control": "dual_range",
+              "range": {"id": "level_pause", "role": "from"}
+            }
+          },
+          "level_pause_max_ms": {
+            "type": "integer",
+            "title": "Пауза между уровнями",
+            "description": "Случайная пауза после родителей, перед их детьми. Софт берёт значение между бегунками.",
+            "default": 2000,
+            "minimum": 0,
+            "maximum": 60000,
+            "multipleOf": 100,
+            "x-ui": {
+              "group": "Темп",
+              "order": 21,
+              "unit": "мс",
+              "control": "dual_range",
+              "range": {"id": "level_pause", "role": "to"}
+            }
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "title": "Таймаут запроса",
+            "description": "Предел ожидания proxy и API на одну заявку. Повтор после таймаута не делается.",
+            "default": 30,
+            "minimum": 5,
+            "maximum": 120,
+            "multipleOf": 1,
+            "x-ui": {
+              "group": "Сеть",
+              "order": 50,
+              "unit": "сек",
+              "advanced": true
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "ui": {
+    "accent": "#1F2421",
+    "monogram": "CA"
+  }
+}
