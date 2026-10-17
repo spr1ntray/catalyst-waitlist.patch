@@ -4,12 +4,12 @@
   "contract_version": "SH-SOFTWARE-0.6/5",
   "id": "io.sprintray.catalyst-waitlist",
   "name": "Catalyst Waitlist",
-  "version": "1.0.2",
-  "description": "Записывает email в waitlist Catalyst по реферальной цепи Hub и через proxy аккаунта.",
+  "version": "1.0.3",
+  "description": "Waitlist Catalyst через proxy и реф-цепь Hub.",
   "author": "sprintray",
   "presentation": {
     "display_name": "Catalyst Waitlist",
-    "description": "Повторяет форму Join waitlist на catalyst.app: email и код родителя из цепи Hub. Twitter не обязателен. Публичный handle, если он нужен, лежит в данных софта под ключом twitter_handle; пустое поле не мешает заявке. Аккаунты одного уровня идут параллельно, следующий уровень ждёт invite-ссылку родителя. Код ссылки в журнал и результаты не попадает.",
+    "description": "Waitlist Catalyst через proxy и реф-цепь Hub.",
     "assets": {
       "icon": "assets/icon.png",
       "image": "assets/image.png"
