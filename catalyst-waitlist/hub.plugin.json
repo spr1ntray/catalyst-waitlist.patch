@@ -4,7 +4,7 @@
   "contract_version": "SH-SOFTWARE-0.6/5",
   "id": "io.sprintray.catalyst-waitlist",
   "name": "Catalyst Waitlist",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Waitlist Catalyst через proxy и реф-цепь Hub.",
   "author": "sprintray",
   "presentation": {
@@ -16,7 +16,7 @@
     }
   },
   "catalog": {
-    "sections": ["nft"]
+    "sections": ["testnet"]
   },
   "compatibility": {
     "hub": ">=0.6.29",

@@ -24,7 +24,7 @@
 Соберите пакет и перетащите его в **Патчи**:
 
 ```bash
-python3 scripts/build_plugin.py catalyst-waitlist dist/catalyst-waitlist-1.0.3.softhub.zip
+python3 scripts/build_plugin.py catalyst-waitlist dist/catalyst-waitlist-1.0.4.softhub.zip
 ```
 
-Нужен Soft Hub `0.6.29` или новее. Раздел карточки — **NFT** (туда Hub складывает WL). Риск действия — внешняя запись, не транзакция.
+Нужен Soft Hub `0.6.29` или новее. Раздел карточки — **Тестнет**. Риск действия — внешняя запись, не транзакция.
